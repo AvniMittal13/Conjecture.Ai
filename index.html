@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conjecture.AI — From research question to draft paper</title>
+    <meta name="description" content="Conjecture.AI is an autonomous research assistant that takes you from a vague question to a near-publishable paper.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #FAFAF7;
+            --text: #1A1A1A;
+            --text-muted: #6B6B6B;
+            --accent: #2B4C7E;
+            --border: #E0DDD8;
+            --serif: 'Instrument Serif', serif;
+            --sans: 'Inter', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        html {
+            font-size: 18px;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            padding: 0 24px;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        /* Nav */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 0 0;
+            margin-bottom: 120px;
+        }
+
+        .wordmark {
+            font-family: var(--serif);
+            font-size: 1.4rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        nav a.nav-link {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2px;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        nav a.nav-link:hover {
+            color: var(--text);
+            border-color: var(--text);
+        }
+
+        /* Hero */
+        .hero {
+            margin-bottom: 140px;
+        }
+
+        .hero h1 {
+            font-family: var(--serif);
+            font-size: clamp(2.8rem, 5vw, 4.2rem);
+            font-weight: 400;
+            line-height: 1.15;
+            margin-bottom: 32px;
+            font-style: italic;
+        }
+
+        .hero .subtitle {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: 20px;
+            max-width: 600px;
+        }
+
+        .hero .description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 48px;
+            max-width: 580px;
+            line-height: 1.7;
+        }
+
+        /* Email capture */
+        .email-capture {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .email-capture input {
+            font-family: var(--sans);
+            font-size: 0.9rem;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            background: #fff;
+            border-radius: 4px;
+            width: 280px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .email-capture input:focus {
+            border-color: var(--accent);
+        }
+
+        .email-capture button {
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 12px 24px;
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .email-capture button:hover {
+            opacity: 0.85;
+        }
+
+        .email-note {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 14px;
+            font-family: var(--mono);
+        }
+
+        /* Sections */
+        section {
+            margin-bottom: 120px;
+        }
+
+        section h2 {
+            font-family: var(--serif);
+            font-size: 1.6rem;
+            font-weight: 400;
+            margin-bottom: 28px;
+        }
+
+        /* Problem section */
+        .problem blockquote {
+            font-size: 1rem;
+            line-height: 1.75;
+            color: var(--text);
+            border-left: 2px solid var(--border);
+            padding-left: 24px;
+            font-style: italic;
+        }
+
+        .problem .attribution {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: var(--mono);
+        }
+
+        /* Steps */
+        .steps {
+            list-style: none;
+        }
+
+        .steps li {
+            display: flex;
+            gap: 20px;
+            align-items: baseline;
+            margin-bottom: 24px;
+        }
+
+        .steps .step-num {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .steps .step-label {
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: 1.1rem;
+            margin-right: 8px;
+        }
+
+        .steps .step-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        /* Diagram */
+        .diagram {
+            margin: 48px 0;
+            padding: 40px 24px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fff;
+        }
+
+        .diagram svg {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .diagram-caption {
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+
+        /* Integration */
+        .integration-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 28px;
+        }
+
+        .integration-card {
+            padding: 24px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fff;
+        }
+
+        .integration-card h3 {
+            font-family: var(--serif);
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .integration-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .integration-card code {
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            background: var(--bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        /* North Star */
+        .north-star {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 40px;
+            background: #fff;
+            text-align: center;
+        }
+
+        .north-star .label {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .north-star h3 {
+            font-family: var(--serif);
+            font-size: clamp(1.5rem, 2.5vw, 2rem);
+            font-weight: 400;
+            font-style: italic;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .north-star p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 600px) {
+            .integration-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Audience */
+        .audience .big-line {
+            font-family: var(--serif);
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 400;
+            font-style: italic;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .audience .sub-line {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Founder */
+        .founder p {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.75;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 80px;
+        }
+
+        footer .wordmark {
+            font-size: 1.1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .footer-links a {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text);
+        }
+
+        .footer-links .copyright {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            nav {
+                margin-bottom: 80px;
+            }
+
+            .hero {
+                margin-bottom: 100px;
+            }
+
+            section {
+                margin-bottom: 80px;
+            }
+
+            .email-capture input {
+                width: 100%;
+            }
+
+            .email-capture {
+                flex-direction: column;
+            }
+
+            .email-capture button {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/" class="wordmark">Conjecture.AI</a>
+            <a href="#access" class="nav-link">Request access</a>
+        </nav>
+
+        <section class="hero" id="access">
+            <h1>Your personal PhD assistant.</h1>
+            <p class="subtitle">From a rough idea to a complete research paper. Conjecture.AI handles the hypothesis, the experimentation, and the writing — so you can focus on thinking.</p>
+            <p class="description">Give it a direction like "mechanistic interpretability for multilingual models." It surveys the literature, forms hypotheses, runs experiments on your compute, critiques its own results, iterates, and produces a publication-ready draft.</p>
+            <form class="email-capture" id="signup-form">
+                <input type="email" name="email" id="email-input" placeholder="you@university.edu" required>
+                <button type="submit">Request early access</button>
+            </form>
+            <p class="email-note" id="form-status">Available end of May 2026 as a VS Code extension.</p>
+        </section>
+
+        <section class="how-it-works">
+            <h2>Three phases. One pipeline.</h2>
+            <ul class="steps">
+                <li>
+                    <span class="step-num">01</span>
+                    <span><span class="step-label">Hypothesize.</span><span class="step-desc">Surveys literature, identifies gaps, and generates testable hypotheses grounded in your available compute.</span></span>
+                </li>
+                <li>
+                    <span class="step-num">02</span>
+                    <span><span class="step-label">Experiment.</span><span class="step-desc">Pilots, full runs, ablations, figures. Critiques its own results and decides what to run next.</span></span>
+                </li>
+                <li>
+                    <span class="step-num">03</span>
+                    <span><span class="step-label">Write.</span><span class="step-desc">A complete paper — abstract through conclusion — that you can submit with minimal tweaks.</span></span>
+                </li>
+            </ul>
+
+            <div class="diagram">
+                <svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Phase boxes -->
+                    <rect x="20" y="60" width="150" height="60" rx="4" fill="none" stroke="#2B4C7E" stroke-width="1.5"/>
+                    <text x="95" y="85" text-anchor="middle" font-family="'Instrument Serif', serif" font-size="15" fill="#1A1A1A" font-style="italic">Hypothesize</text>
+                    <text x="95" y="105" text-anchor="middle" font-family="'Inter', sans-serif" font-size="10" fill="#6B6B6B">Literature → Gaps → Ideas</text>
+
+                    <rect x="225" y="60" width="150" height="60" rx="4" fill="none" stroke="#2B4C7E" stroke-width="1.5"/>
+                    <text x="300" y="85" text-anchor="middle" font-family="'Instrument Serif', serif" font-size="15" fill="#1A1A1A" font-style="italic">Experiment</text>
+                    <text x="300" y="105" text-anchor="middle" font-family="'Inter', sans-serif" font-size="10" fill="#6B6B6B">Run → Critique → Iterate</text>
+
+                    <rect x="430" y="60" width="150" height="60" rx="4" fill="none" stroke="#2B4C7E" stroke-width="1.5"/>
+                    <text x="505" y="85" text-anchor="middle" font-family="'Instrument Serif', serif" font-size="15" fill="#1A1A1A" font-style="italic">Write</text>
+                    <text x="505" y="105" text-anchor="middle" font-family="'Inter', sans-serif" font-size="10" fill="#6B6B6B">Draft → Revise → Submit</text>
+
+                    <!-- Arrows -->
+                    <line x1="170" y1="90" x2="225" y2="90" stroke="#2B4C7E" stroke-width="1.2"/>
+                    <polygon points="222,86 230,90 222,94" fill="#2B4C7E"/>
+
+                    <line x1="375" y1="90" x2="430" y2="90" stroke="#2B4C7E" stroke-width="1.2"/>
+                    <polygon points="427,86 435,90 427,94" fill="#2B4C7E"/>
+
+                    <!-- Feedback loop -->
+                    <path d="M 430 125 Q 300 165 170 125" fill="none" stroke="#6B6B6B" stroke-width="1" stroke-dasharray="4,3"/>
+                    <polygon points="173,122 168,128 175,128" fill="#6B6B6B"/>
+                    <text x="300" y="158" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9" fill="#6B6B6B">self-critique loop</text>
+
+                    <!-- Input -->
+                    <text x="95" y="45" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9" fill="#6B6B6B">rough idea</text>
+                    <line x1="95" y1="50" x2="95" y2="60" stroke="#6B6B6B" stroke-width="1"/>
+
+                    <!-- Output -->
+                    <text x="505" y="45" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9" fill="#6B6B6B">research paper</text>
+                    <line x1="505" y1="50" x2="505" y2="60" stroke="#6B6B6B" stroke-width="1"/>
+                </svg>
+                <p class="diagram-caption">rough idea → literature review → hypothesis → experiments → self-critique → paper</p>
+            </div>
+        </section>
+
+        <section class="integration">
+            <h2>Integrate with your workflow</h2>
+            <div class="integration-grid">
+                <div class="integration-card">
+                    <h3>Coding assistant</h3>
+                    <p>Works alongside your existing coding tools. Conjecture runs experiments using your local environment, SSH remotes, or cloud compute — plugging directly into your dev workflow.</p>
+                </div>
+                <div class="integration-card">
+                    <h3>Bring your own API key</h3>
+                    <p>Use your own <code>OPENAI_API_KEY</code>, <code>ANTHROPIC_API_KEY</code>, or any provider. Full control over model choice, cost, and rate limits.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="north-star">
+                <p class="label">North Star</p>
+                <h3>The automated PhD thesis.</h3>
+                <p>Long-term research planning across months, not minutes. Conjecture.AI is building toward autonomous multi-paper research programs — from initial exploration to a coherent thesis.</p>
+            </div>
+        </section>
+
+        <section class="problem">
+            <blockquote>
+                I have been doing research for four years. With coding tools, the process has been aided a lot, but I feel the constant frustration of repeating the same steps for every new idea, watching agent sessions digress as context piles up, and having to start from scratch every single time. I built Conjecture.AI for myself first. I have used it to get papers accepted at A-star workshops. This is only the beginning.
+            </blockquote>
+            <p class="attribution">— Avni Mittal, Founder</p>
+        </section>
+
+        <section class="audience">
+            <p class="big-line">Built for researchers who have more ideas than time.</p>
+            <p class="sub-line">PhD students, research engineers, and labs running real experiments.</p>
+        </section>
+
+        <section class="founder">
+            <h2>About</h2>
+            <p>Conjecture.AI is built by Avni Mittal, a Data Scientist at Microsoft and incoming pre-doctoral researcher at Google DeepMind. Four years of research experience, with papers accepted at workshops, conferences, and international journals.</p>
+        </section>
+
+        <footer>
+            <span class="wordmark">Conjecture.AI</span>
+            <div class="footer-links">
+                <a href="mailto:avni@conjecture.ai">Email</a>
+                <a href="https://twitter.com/" target="_blank" rel="noopener">Twitter</a>
+                <a href="https://linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+                <span class="copyright">&copy; 2026</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Replace SCRIPT_URL with your deployed Google Apps Script web app URL
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL';
+
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email-input').value;
+            const status = document.getElementById('form-status');
+            const btn = e.target.querySelector('button');
+
+            btn.disabled = true;
+            btn.textContent = 'Submitting...';
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, timestamp: new Date().toISOString() })
+                });
+                status.textContent = '✓ You're on the list. We'll be in touch.';
+                status.style.color = '#2B4C7E';
+                document.getElementById('email-input').value = '';
+            } catch (err) {
+                status.textContent = 'Something went wrong. Try again or email avni.mittal2002@gmail.com';
+                status.style.color = '#9B2C2C';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Request early access';
+            }
+        });
+    </script>
+</body>
+</html>
